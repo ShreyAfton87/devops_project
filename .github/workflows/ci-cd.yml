@@ -1,0 +1,45 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      # Install dependencies
+      - name: Install dependencies
+        run: |
+          pip install numpy pandas scikit-learn joblib
+
+      # Run tests
+      - name: Run tests
+        run: |
+          python boston_ml.py
+
+  dockerize:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Build Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t boston-ml-app .
